@@ -533,7 +533,7 @@ h1 {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: background 0.2s ease-out, color 0.2s ease-out,
+  transition: 0.2s ease-out, color 0.2s ease-out,
     transform 0.15s ease-out, box-shadow 0.2s ease-out;
 }
 
