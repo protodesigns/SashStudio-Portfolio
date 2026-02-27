@@ -84,19 +84,20 @@ textarea {
   }
 }
 
-/* Custom cursor (desktop only) */
+/* Custom cursor (desktop only).
+   Important: only hide the OS cursor *after* JS enables it. */
 @media (hover: hover) and (pointer: fine) {
-  html {
+  html.cursor-enabled {
     cursor: none;
   }
 
-  a,
-  button,
-  input,
-  textarea,
-  select,
-  label,
-  [role="button"] {
+  html.cursor-enabled a,
+  html.cursor-enabled button,
+  html.cursor-enabled input,
+  html.cursor-enabled textarea,
+  html.cursor-enabled select,
+  html.cursor-enabled label,
+  html.cursor-enabled [role="button"] {
     cursor: none;
   }
 
@@ -108,6 +109,13 @@ textarea {
     pointer-events: none;
     z-index: 200;
     transform: translate3d(-999px, -999px, 0);
+    opacity: 0;
+    transition: opacity 120ms ease-out;
+  }
+
+  html.cursor-enabled .custom-cursor,
+  html.cursor-enabled .custom-cursor-dot {
+    opacity: 1;
   }
 
   .custom-cursor {
@@ -117,10 +125,9 @@ textarea {
     margin-top: -17px;
     border-radius: 999px;
     border: 1.5px solid rgba(33, 240, 255, 0.9);
-    box-shadow: 0 0 22px rgba(33, 240, 255, 0.25);
     transition: width 180ms ease-out, height 180ms ease-out,
       margin 180ms ease-out, background 180ms ease-out,
-      box-shadow 180ms ease-out, border-color 180ms ease-out;
+      border-color 180ms ease-out;
   }
 
   .custom-cursor-dot {
@@ -130,17 +137,15 @@ textarea {
     margin-top: -3.5px;
     border-radius: 999px;
     background: rgba(33, 240, 255, 0.95);
-    box-shadow: 0 0 16px rgba(33, 240, 255, 0.35);
   }
 
-  html.cursor-hover .custom-cursor {
+  html.cursor-hover.cursor-enabled .custom-cursor {
     width: 46px;
     height: 46px;
     margin-left: -23px;
     margin-top: -23px;
     background: rgba(33, 240, 255, 0.1);
     border-color: rgba(33, 240, 255, 1);
-    box-shadow: 0 0 30px rgba(33, 240, 255, 0.38);
   }
 }
 
@@ -1071,7 +1076,7 @@ h1 {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  z-index: 90;
+  z-index: 600;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.25s ease-out, visibility 0.25s ease-out;
