@@ -659,6 +659,11 @@ h1 {
 }
 
 @media (max-width: 960px) {
+  .hero {
+    min-height: auto;
+    align-items: flex-start;
+  }
+
   .hero-inner {
     grid-template-columns: minmax(0, 1.4fr);
     padding: 30px 22px 26px;
@@ -666,6 +671,8 @@ h1 {
 
   .hero-right {
     margin-top: 24px;
+    margin-left: 0;
+    max-width: 100%;
   }
 
   .works-grid {
@@ -703,7 +710,7 @@ h1 {
   }
 
   .hero-inner {
-    padding: 24px 24px 26px;
+    padding: 24px 18px 26px;
   }
 
   .hero-left {
