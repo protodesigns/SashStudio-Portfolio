@@ -121,7 +121,7 @@ body {
 .bg-layer {
   position: fixed;
   inset: 0;
-  background: url("images/background.jpg") center/cover no-repeat;
+  background: url("images/background1.jpg") center/cover no-repeat;
   filter: none;
   z-index: -2;
 }
