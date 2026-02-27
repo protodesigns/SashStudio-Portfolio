@@ -448,14 +448,9 @@
         nodes.forEach((el) => revealObserver.observe(el));
       })();
 
-      // Custom cursor (desktop only)
+      // Custom cursor
       (() => {
         try {
-          const isDesktopPointer =
-            window.matchMedia &&
-            window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-          if (!isDesktopPointer) return;
-
           const cursor = document.querySelector(".custom-cursor");
           const dot = document.querySelector(".custom-cursor-dot");
           if (!cursor || !dot) return;
