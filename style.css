@@ -837,7 +837,7 @@ h1 {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 640px) {
   .header-inner {
     flex-direction: row;
     align-items: center;
