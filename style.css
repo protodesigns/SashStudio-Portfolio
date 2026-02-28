@@ -245,13 +245,11 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: clamp(12px, 2.2vw, 16px) clamp(14px, 4vw, 34px);
+  padding: 16px 34px;
   border-radius: 999px;
   background: #ffffff;
   border: 2px solid rgba(0, 0, 0, 0.12);
   backdrop-filter: none;
-  gap: 14px;
-  overflow: visible;
 }
 
 .logo {
@@ -259,46 +257,24 @@ textarea {
   border: none;
   background: none;
   font-weight: 500;
-  font-size: clamp(0.74rem, 2.8vw, 0.95rem);
-  letter-spacing: clamp(0.04em, 0.4vw, 0.08em);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
   color: #000000;
-  white-space: nowrap;
 }
 
 .main-nav {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  min-width: 0;
-  gap: 10px;
-  font-size: clamp(0.56rem, 2.1vw, 0.8rem);
+  gap: 40px;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: clamp(0.05em, 0.5vw, 0.16em);
-}
-
-.nav-list {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: clamp(10px, 3vw, 40px);
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  min-width: 0;
-  overflow: hidden;
-  flex: 0 1 auto;
-}
-
-.nav-list li {
-  margin: 0;
-  padding: 0;
+  letter-spacing: 0.16em;
 }
 
 .main-nav a {
   color: #000000;
   text-decoration: none;
   position: relative;
-  white-space: nowrap;
 }
 
 .main-nav a::after {
@@ -318,77 +294,6 @@ textarea {
 
 .main-nav a:hover::after {
   width: 100%;
-}
-
-.nav-overflow {
-  position: relative;
-  flex: 0 0 auto;
-}
-
-.nav-overflow-btn {
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  background: rgba(255, 255, 255, 0.8);
-  color: #000000;
-  font: inherit;
-  text-transform: inherit;
-  letter-spacing: inherit;
-  padding: 8px 10px;
-  border-radius: 999px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.nav-overflow-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.nav-overflow-caret {
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 6px solid rgba(0, 0, 0, 0.7);
-}
-
-.nav-overflow-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 10px);
-  width: max-content;
-  min-width: 180px;
-  margin: 0;
-  padding: 8px;
-  list-style: none;
-  border-radius: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: #ffffff;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
-  display: none;
-  z-index: 50;
-}
-
-.nav-overflow.is-open .nav-overflow-menu {
-  display: block;
-}
-
-.nav-overflow-menu li {
-  margin: 0;
-}
-
-.nav-overflow-menu a {
-  display: block;
-  padding: 10px 10px;
-  border-radius: 12px;
-}
-
-.nav-overflow-menu a:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.nav-overflow-menu a::after {
-  display: none;
 }
 
 .hero {
@@ -902,6 +807,11 @@ h1 {
     padding-inline: 20px;
   }
 
+  .main-nav {
+    gap: 24px;
+    font-size: 0.75rem;
+  }
+
   .hero {
     min-height: auto;
     align-items: flex-start;
@@ -931,6 +841,13 @@ h1 {
   .logo {
     font-size: 0.8rem;
     letter-spacing: 0.09em;
+  }
+
+  .main-nav {
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    font-size: 0.7rem;
   }
 
   .hero {
