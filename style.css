@@ -61,18 +61,15 @@ textarea {
 .reveal {
   opacity: 0;
   transform: translateY(18px);
-  filter: blur(2px);
   transition: opacity 700ms cubic-bezier(0.19, 1, 0.22, 1),
-    transform 700ms cubic-bezier(0.19, 1, 0.22, 1),
-    filter 700ms cubic-bezier(0.19, 1, 0.22, 1);
+    transform 700ms cubic-bezier(0.19, 1, 0.22, 1);
   transition-delay: var(--reveal-delay, 0ms);
-  will-change: opacity, transform, filter;
+  will-change: opacity, transform;
 }
 
 .reveal.reveal-visible {
   opacity: 1;
   transform: translateY(0);
-  filter: blur(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -157,7 +154,6 @@ textarea {
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  backdrop-filter: blur(6px);
   transition: opacity 0.6s ease, visibility 0.6s ease;
 }
 
@@ -414,7 +410,6 @@ h1 {
   box-shadow:
     0 18px 55px rgba(0, 0, 0, 0.9),
     inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(26px);
 }
 
 .cta-pill-button {
@@ -474,7 +469,6 @@ h1 {
   border-radius: 43px;
   border: 1px solid rgba(255, 255, 255, 0.45);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(22px);
 }
 
 .hero-right,
@@ -850,10 +844,16 @@ h1 {
   }
 
   .main-nav {
-    gap: 16px;
+    gap: 12px;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
     flex-wrap: wrap;
     justify-content: flex-end;
-    font-size: 0.7rem;
+    row-gap: 6px;
+  }
+
+  .main-nav a {
+    white-space: nowrap;
   }
 
   .hero {
@@ -909,6 +909,22 @@ h1 {
 }
 
 @media (max-width: 540px) {
+  .header-inner {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .logo {
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+  }
+
+  .main-nav {
+    gap: 10px;
+    font-size: 0.58rem;
+    letter-spacing: 0.05em;
+  }
+
   .container {
     width: min(1180px, 100% - 32px);
   }
@@ -936,13 +952,16 @@ h1 {
   }
 }
 
-/* Footer refinements */
+/* Footer refinements (match overall light palette; no entrance animations) */
 
 .site-footer {
-  padding: 32px 0 38px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: radial-gradient(circle at top left, #111827 0, #030710 55%, #000000 100%);
-  color: var(--text-main);
+  padding: 34px 0 40px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(33, 240, 255, 0.12), transparent 45%),
+    radial-gradient(circle at 90% 120%, rgba(0, 0, 0, 0.05), transparent 55%),
+    #f6f7f9;
+  color: #0b0f18;
 }
 
 .footer-inner {
@@ -950,39 +969,37 @@ h1 {
 }
 
 .footer-label {
-  letter-spacing: 0.18em;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--text-soft);
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .footer-links {
-  gap: 8px 16px;
+  gap: 10px 18px;
 }
 
 .footer-links a {
-  color: var(--text-main);
-  font-size: 0.8rem;
-}
-
-.footer-links a::after {
-  background: linear-gradient(90deg, var(--accent), transparent);
+  color: rgba(0, 0, 0, 0.9);
 }
 
 .footer-name {
-  letter-spacing: 0.16em;
-  font-size: 0.85rem;
-  color: var(--text-main);
+  color: rgba(0, 0, 0, 0.88);
 }
 
 .footer-tagline {
-  color: var(--text-muted);
+  color: rgba(0, 0, 0, 0.62);
   line-height: 1.5;
+}
+
+.footer-copy {
+  color: rgba(0, 0, 0, 0.55);
+  opacity: 1;
 }
 
 @media (max-width: 720px) {
   .site-footer {
-    padding-top: 26px;
+    padding-top: 28px;
   }
 
   .footer-inner {
