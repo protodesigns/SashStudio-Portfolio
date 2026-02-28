@@ -28,13 +28,39 @@
       <div class="container header-inner">
         <div class="logo">I'm Sash.</div>
         <nav class="main-nav" aria-label="Main navigation">
-          <a href="#contact">Contact me</a>
-          <a href="https://in.linkedin.com/in/sash-ragesh-216095293" target="_blank" rel="noreferrer"
-            >LinkedIn</a
-          >
-          <a href="https://www.instagram.com/forgedvisuals" target="_blank" rel="noreferrer"
-            >Instagram</a
-          >
+          <ul class="nav-list" id="nav-list">
+            <li><a href="#contact">Contact me</a></li>
+            <li>
+              <a
+                href="https://in.linkedin.com/in/sash-ragesh-216095293"
+                target="_blank"
+                rel="noreferrer"
+                >LinkedIn</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://www.instagram.com/forgedvisuals"
+                target="_blank"
+                rel="noreferrer"
+                >Instagram</a
+              >
+            </li>
+          </ul>
+
+          <div class="nav-overflow" id="nav-overflow" hidden>
+            <button
+              type="button"
+              class="nav-overflow-btn"
+              id="nav-more"
+              aria-haspopup="menu"
+              aria-expanded="false"
+            >
+              More
+              <span class="nav-overflow-caret" aria-hidden="true"></span>
+            </button>
+            <ul class="nav-overflow-menu" id="nav-more-menu" role="menu"></ul>
+          </div>
         </nav>
       </div>
     </header>
@@ -305,6 +331,93 @@
       if (yearEl) {
         yearEl.textContent = new Date().getFullYear().toString();
       }
+
+      // Responsive "priority+" nav (no breakpoints/hardcoding)
+      (() => {
+        const headerInner = document.querySelector(".header-inner");
+        const list = document.getElementById("nav-list");
+        const overflow = document.getElementById("nav-overflow");
+        const moreBtn = document.getElementById("nav-more");
+        const moreMenu = document.getElementById("nav-more-menu");
+
+        if (!headerInner || !list || !overflow || !moreBtn || !moreMenu) return;
+
+        const allItems = Array.from(list.children);
+
+        const closeMenu = () => {
+          overflow.classList.remove("is-open");
+          moreBtn.setAttribute("aria-expanded", "false");
+        };
+
+        const setOverflowActive = (active) => {
+          overflow.hidden = !active;
+          overflow.classList.toggle("is-active", active);
+          if (!active) closeMenu();
+        };
+
+        const reset = () => {
+          closeMenu();
+          setOverflowActive(false);
+          allItems.forEach((li) => list.appendChild(li));
+        };
+
+        const update = () => {
+          reset();
+
+          // If everything fits, keep it inline.
+          if (list.scrollWidth <= list.clientWidth) return;
+
+          // Otherwise activate the "More" button and move items until it fits.
+          setOverflowActive(true);
+
+          while (list.scrollWidth > list.clientWidth && list.children.length > 1) {
+            const last = list.lastElementChild;
+            if (!last) break;
+            moreMenu.insertBefore(last, moreMenu.firstChild);
+          }
+
+          // If we didn't actually overflow, hide it again.
+          if (moreMenu.children.length === 0) setOverflowActive(false);
+        };
+
+        const schedule = (() => {
+          let raf = 0;
+          return () => {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(update);
+          };
+        })();
+
+        moreBtn.addEventListener("click", () => {
+          const isOpen = overflow.classList.toggle("is-open");
+          moreBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        });
+
+        document.addEventListener("click", (e) => {
+          const target = e.target;
+          if (target && overflow.contains(target)) return;
+          closeMenu();
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") closeMenu();
+        });
+
+        moreMenu.addEventListener("click", (e) => {
+          const target = e.target;
+          if (target && target.closest && target.closest("a")) closeMenu();
+        });
+
+        if ("ResizeObserver" in window) {
+          const ro = new ResizeObserver(schedule);
+          ro.observe(headerInner);
+        } else {
+          window.addEventListener("resize", schedule);
+        }
+
+        // Initial layout
+        schedule();
+      })();
 
       // Animate skills when the panel becomes visible
       const skillsPanel = document.querySelector(".hero-right");
