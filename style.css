@@ -309,6 +309,57 @@ textarea {
   width: 100%;
 }
 
+/* Hamburger toggle (shown on small screens) */
+.nav-toggle {
+  display: none;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.nav-toggle-bar {
+  width: 20px;
+  height: 2px;
+  border-radius: 999px;
+  background: #000000;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+body.nav-open .nav-toggle-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+body.nav-open .nav-toggle-bar:nth-child(2) {
+  opacity: 0;
+}
+
+body.nav-open .nav-toggle-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease-out, visibility 0.25s ease-out;
+  z-index: 40;
+}
+
+body.nav-open .nav-backdrop {
+  opacity: 1;
+  visibility: visible;
+}
+
 .hero {
   padding: var(--space-2xl) 0 calc(var(--space-2xl) + var(--space-md));
   min-height: calc(100vh - 120px);
@@ -837,7 +888,7 @@ h1 {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .header-inner {
     flex-direction: row;
     align-items: center;
@@ -851,9 +902,36 @@ h1 {
     letter-spacing: 0.09em;
   }
 
-  /* Hide nav entirely on small screens */
+  .nav-toggle {
+    display: flex;
+  }
+
   .main-nav {
+    position: fixed;
+    inset: 0;
     display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 80px 28px 32px;
+    background: #050710;
+    color: #ffffff;
+    z-index: 50;
+    gap: 18px;
+  }
+
+  body.nav-open .main-nav {
+    display: flex;
+  }
+
+  body.nav-open .main-nav a {
+    color: #ffffff;
+    font-size: 0.9rem;
+    letter-spacing: 0.14em;
+  }
+
+  body.nav-open .main-nav a::after {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), transparent);
   }
 
   .hero {

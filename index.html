@@ -27,7 +27,18 @@
     <header class="site-header" id="top">
       <div class="container header-inner">
         <div class="logo">I'm Sash.</div>
-        <nav class="main-nav" aria-label="Main navigation">
+        <button
+          type="button"
+          class="nav-toggle"
+          id="nav-toggle"
+          aria-label="Open menu"
+          aria-expanded="false"
+        >
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+        </button>
+        <nav class="main-nav" id="main-nav" aria-label="Main navigation">
           <a href="#contact">Contact me</a>
           <a
             href="https://in.linkedin.com/in/sash-ragesh-216095293"
@@ -44,6 +55,7 @@
         </nav>
       </div>
     </header>
+    <div class="nav-backdrop" id="nav-backdrop" aria-hidden="true"></div>
 
     <main>
       <section class="hero" aria-labelledby="intro-heading">
@@ -522,6 +534,49 @@
 
         ["copy", "cut", "paste", "contextmenu", "dragstart"].forEach((type) => {
           document.addEventListener(type, blockIfNotEditable);
+        });
+      })();
+
+      // Mobile nav drawer: hamburger toggles full-screen menu
+      (() => {
+        const toggle = document.getElementById("nav-toggle");
+        const nav = document.getElementById("main-nav");
+        const backdrop = document.getElementById("nav-backdrop");
+        if (!toggle || !nav || !backdrop) return;
+
+        const body = document.body;
+
+        const open = () => {
+          body.classList.add("nav-open");
+          toggle.setAttribute("aria-expanded", "true");
+          toggle.setAttribute("aria-label", "Close menu");
+          backdrop.setAttribute("aria-hidden", "false");
+        };
+
+        const close = () => {
+          body.classList.remove("nav-open");
+          toggle.setAttribute("aria-expanded", "false");
+          toggle.setAttribute("aria-label", "Open menu");
+          backdrop.setAttribute("aria-hidden", "true");
+        };
+
+        toggle.addEventListener("click", () => {
+          if (body.classList.contains("nav-open")) close();
+          else open();
+        });
+
+        backdrop.addEventListener("click", close);
+
+        nav.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", () => {
+            if (body.classList.contains("nav-open")) close();
+          });
+        });
+
+        window.addEventListener("keydown", (event) => {
+          if (event.key === "Escape" && body.classList.contains("nav-open")) {
+            close();
+          }
         });
       })();
 
