@@ -24,6 +24,7 @@
     </div>
 
     <div class="bg-layer"></div>
+    <div id="scroll-root">
     <header class="site-header" id="top">
       <div class="container header-inner">
         <div class="logo">I'm Sash.</div>
@@ -289,6 +290,7 @@
         </div>
       </div>
     </footer>
+    </div><!-- /scroll-root -->
 
     <div
       class="warning-modal-overlay"
@@ -318,15 +320,30 @@
     <div class="custom-cursor-dot" aria-hidden="true"></div>
 
     <script>
+      // Scroll container: prevent stuck-scroll on tablets - clamp to valid range
+      (() => {
+        const scrollRoot = document.getElementById("scroll-root");
+        if (!scrollRoot) return;
+        const clamp = () => {
+          const maxScroll = scrollRoot.scrollHeight - scrollRoot.clientHeight;
+          if (scrollRoot.scrollTop > maxScroll) {
+            scrollRoot.scrollTop = maxScroll;
+          }
+        };
+        scrollRoot.addEventListener("scroll", clamp, { passive: true });
+        window.addEventListener("resize", clamp);
+      })();
+
       // Set dynamic year in footer
       const yearEl = document.getElementById("year");
       if (yearEl) {
         yearEl.textContent = new Date().getFullYear().toString();
       }
 
-      // Animate skills when the panel becomes visible
+      // Animate skills when the panel becomes visible (use scroll-root as observer root)
       const skillsPanel = document.querySelector(".hero-right");
-      if ("IntersectionObserver" in window && skillsPanel) {
+      const scrollRoot = document.getElementById("scroll-root");
+      if ("IntersectionObserver" in window && skillsPanel && scrollRoot) {
         const observer = new IntersectionObserver(
           (entries, obs) => {
             entries.forEach((entry) => {
@@ -336,9 +353,7 @@
               }
             });
           },
-          {
-            threshold: 0.35,
-          }
+          { threshold: 0.35, root: scrollRoot }
         );
         observer.observe(skillsPanel);
       } else if (skillsPanel) {
@@ -449,6 +464,7 @@
           return;
         }
 
+        const scrollRootForReveal = document.getElementById("scroll-root");
         const revealObserver = new IntersectionObserver(
           (entries, obs) => {
             entries.forEach((entry) => {
@@ -458,7 +474,7 @@
               }
             });
           },
-          { threshold: 0.18, rootMargin: "0px 0px -10% 0px" }
+          { threshold: 0.18, rootMargin: "0px 0px -10% 0px", root: scrollRootForReveal || null }
         );
 
         nodes.forEach((el) => revealObserver.observe(el));

@@ -39,31 +39,26 @@
    Ensures layout works on any screen size
    ============================================ */
 
-/* 1. Root viewport constraint - no content ever exceeds screen width */
+/* 1. Root: no native document scroll - we use a scroll container instead (fixes tablet stuck-scroll) */
 html {
   width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto; /* Avoid forced scrollbar; use auto for smoother mobile scroll */
-  -webkit-text-size-adjust: 100%; /* Stop iOS from inflating text and breaking layout */
+  height: 100%;
+  overflow: hidden;
+  -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scroll-padding-top: 96px;
 }
 
-/* 2. Body: content-sized height (no 100vh - causes phantom scroll on mobile) */
+/* 2. Body: fixed size, no scroll */
 html,
 body {
   margin: 0;
   padding: 0;
-  min-height: auto;
+  height: 100%;
+  min-height: 100%;
   min-width: 0;
   width: 100%;
   max-width: 100%;
-  scroll-behavior: smooth;
-}
-
-body {
-  /* No scroll-snap: it causes "stuck" scroll on mobile when scrolled past footer */
-  overscroll-behavior-y: contain; /* Prevent scroll chaining / rubber-band issues */
+  overflow: hidden;
 }
 
 body {
@@ -72,12 +67,21 @@ body {
   color: #000000;
   background-color: var(--bg-dark);
   position: relative;
-  overflow-x: hidden;
   overflow-wrap: break-word;
-  word-wrap: break-word; /* Legacy alias for older browsers */
-  /* Safe area: content avoids notches/cutouts (iPhone X+, etc.) */
+  word-wrap: break-word;
   padding-left: env(safe-area-inset-left, 0);
   padding-right: env(safe-area-inset-right, 0);
+}
+
+/* 3. Scroll container: ALL scrolling happens here - avoids tablet native scroll bugs */
+#scroll-root {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Momentum scroll on iOS */
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
 }
 
 /* 3. Global constraint: replaced elements NEVER overflow (YouTube/Bootstrap pattern) */
