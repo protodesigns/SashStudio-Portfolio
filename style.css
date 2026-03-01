@@ -49,12 +49,12 @@ html {
   scroll-padding-top: 96px;
 }
 
-/* 2. Body fills viewport, contains overflow */
+/* 2. Body: content-sized height (no 100vh - causes phantom scroll on mobile) */
 html,
 body {
   margin: 0;
   padding: 0;
-  min-height: 100%;
+  min-height: auto;
   min-width: 0;
   width: 100%;
   max-width: 100%;
@@ -436,7 +436,8 @@ body.nav-open .nav-backdrop {
 
 .hero {
   padding: var(--space-2xl) 0 calc(var(--space-2xl) + var(--space-md));
-  min-height: calc(100vh - 120px);
+  /* Avoid 100vh: on mobile it creates phantom scroll space & stuck scroll */
+  min-height: auto;
   display: flex;
   align-items: center;
 }
@@ -696,7 +697,8 @@ h1 {
 
 .works {
   padding: var(--space-2xl) 0 calc(var(--space-2xl) + var(--space-md));
-  min-height: calc(100vh - 120px);
+  /* Avoid 100vh: on mobile it creates phantom scroll space & stuck scroll */
+  min-height: auto;
   display: flex;
   align-items: center;
   background-color: #ececec;
