@@ -437,49 +437,6 @@
         });
       }
 
-      // Reveal animations on scroll
-      (() => {
-        const revealTargets = [
-          ".site-header .header-inner",
-          ".hero-left > *",
-          ".hero-right",
-          ".works h2",
-          ".works .works-subtitle",
-          ".works .work-card",
-          ".contact .contact-inner > *",
-        ];
-
-        const nodes = [];
-        revealTargets.forEach((selector) => {
-          document.querySelectorAll(selector).forEach((el) => nodes.push(el));
-        });
-
-        nodes.forEach((el, idx) => {
-          el.classList.add("reveal");
-          el.style.setProperty("--reveal-delay", `${Math.min(idx * 45, 240)}ms`);
-        });
-
-        if (!("IntersectionObserver" in window)) {
-          nodes.forEach((el) => el.classList.add("reveal-visible"));
-          return;
-        }
-
-        const scrollRootForReveal = document.getElementById("scroll-root");
-        const revealObserver = new IntersectionObserver(
-          (entries, obs) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                entry.target.classList.add("reveal-visible");
-                obs.unobserve(entry.target);
-              }
-            });
-          },
-          { threshold: 0.18, rootMargin: "0px 0px -10% 0px", root: scrollRootForReveal || null }
-        );
-
-        nodes.forEach((el) => revealObserver.observe(el));
-      })();
-
       // Custom cursor
       (() => {
         try {
@@ -596,16 +553,11 @@
         });
       })();
 
-      // Loading screen: 3s overlay, then reveal animations
+      // Loading screen: brief overlay, then content
       window.addEventListener("load", () => {
         const loader = document.getElementById("loader");
         if (!loader) return;
-        // mark app ready for entrance animations
-        document.documentElement.classList.add("app-animate");
-        // keep loader briefly for a short intro
-        setTimeout(() => {
-          loader.classList.add("loader-hidden");
-        }, 2000);
+        setTimeout(() => loader.classList.add("loader-hidden"), 1500);
       });
     </script>
   </body>

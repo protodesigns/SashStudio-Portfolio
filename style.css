@@ -132,30 +132,6 @@ textarea {
   user-select: text;
 }
 
-/* Reveal animations */
-.reveal {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 700ms cubic-bezier(0.19, 1, 0.22, 1),
-    transform 700ms cubic-bezier(0.19, 1, 0.22, 1);
-  transition-delay: var(--reveal-delay, 0ms);
-  will-change: opacity, transform;
-}
-
-.reveal.reveal-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
-    transform: none;
-    filter: none;
-    transition: none;
-  }
-}
-
 /* Custom cursor (desktop only).
    Important: only hide the OS cursor *after* JS enables it. */
 @media (hover: hover) and (pointer: fine) {
@@ -446,40 +422,6 @@ body.nav-open .nav-backdrop {
   align-items: center;
 }
 
-@keyframes fadeUpSoft {
-  from {
-    opacity: 0;
-    transform: translateY(26px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-html:not(.app-animate) .site-header,
-html:not(.app-animate) .hero,
-html:not(.app-animate) .works,
-html:not(.app-animate) .contact {
-  opacity: 0;
-}
-
-html.app-animate .site-header {
-  animation: fadeUpSoft 0.9s cubic-bezier(0.19, 1, 0.22, 1) 0.1s forwards;
-}
-
-html.app-animate .hero {
-  animation: fadeUpSoft 1s cubic-bezier(0.19, 1, 0.22, 1) 0.3s forwards;
-}
-
-html.app-animate .works {
-  animation: fadeUpSoft 1s cubic-bezier(0.19, 1, 0.22, 1) 0.6s forwards;
-}
-
-html.app-animate .contact {
-  animation: fadeUpSoft 1s cubic-bezier(0.19, 1, 0.22, 1) 0.9s forwards;
-}
-
 .hero-inner {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1.1fr);
@@ -691,6 +633,16 @@ h1 {
   width: 35%;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .hero-right .skill-fill { transition: none; }
+  .hero-right .skill-photoshop { width: 85% !important; }
+  .hero-right .skill-davinci { width: 70% !important; }
+  .hero-right .skill-blender { width: 80% !important; }
+  .hero-right .skill-aftereffects { width: 80% !important; }
+  .hero-right .skill-premiere { width: 69% !important; }
+  .hero-right .skill-illustrator { width: 35% !important; }
+}
+
 .skill-note {
   margin: 16px 4px 0;
   font-size: 0.75rem;
@@ -765,16 +717,7 @@ h1 {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
   display: block;
   background: #000000;
-  transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1),
-    box-shadow 0.45s cubic-bezier(0.19, 1, 0.22, 1),
-    filter 0.45s cubic-bezier(0.19, 1, 0.22, 1);
   cursor: default;
-}
-
-.work-card:hover .work-media {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.95);
-  filter: saturate(1.05) brightness(1.03);
 }
 
 .works-cta {
