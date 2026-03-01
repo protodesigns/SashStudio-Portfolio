@@ -34,16 +34,31 @@
   box-shadow: none !important;
 }
 
+/* ============================================
+   RESPONSIVE FOUNDATION (YouTube/Facebook-style)
+   Ensures layout works on any screen size
+   ============================================ */
+
+/* 1. Root viewport constraint - no content ever exceeds screen width */
+html {
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll; /* Prevent layout shift from scrollbar appear/disappear */
+  -webkit-text-size-adjust: 100%; /* Stop iOS from inflating text and breaking layout */
+  text-size-adjust: 100%;
+  scroll-padding-top: 96px;
+}
+
+/* 2. Body fills viewport, contains overflow */
 html,
 body {
   margin: 0;
   padding: 0;
   min-height: 100%;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
   scroll-behavior: smooth;
-}
-
-html {
-  scroll-padding-top: 96px;
 }
 
 body {
@@ -57,6 +72,47 @@ body {
   background-color: var(--bg-dark);
   position: relative;
   overflow-x: hidden;
+  overflow-wrap: break-word;
+  word-wrap: break-word; /* Legacy alias for older browsers */
+  /* Safe area: content avoids notches/cutouts (iPhone X+, etc.) */
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
+}
+
+/* 3. Global constraint: replaced elements NEVER overflow (YouTube/Bootstrap pattern) */
+img,
+video,
+svg,
+canvas,
+object,
+embed {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+img,
+video {
+  object-fit: contain; /* Preserve aspect, fit within bounds; override per-element if needed */
+}
+
+/* SVG: block display + max-width prevents layout overflow */
+svg {
+  max-height: 100%;
+}
+
+/* 4. Prevent table overflow on tiny screens */
+table {
+  width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
+}
+
+/* 5. Main content area - flexible, never overflows */
+main {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Prevent easy copy/select (can be bypassed) */
@@ -240,9 +296,14 @@ textarea {
   z-index: -2;
 }
 
+/* Fluid container: works on 320px phones to 4K displays (Bootstrap/YouTube pattern) */
 .container {
-  width: min(1180px, 100% - 48px);
-  margin: 0 auto;
+  width: 100%;
+  max-width: min(1180px, 100%); /* Belt-and-suspenders: never exceed parent */
+  margin-left: auto;
+  margin-right: auto;
+  padding-inline: 24px;
+  box-sizing: border-box;
 }
 
 .site-header {
@@ -258,6 +319,7 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-width: 0;
   padding: var(--space-md) var(--space-xl);
   border-radius: 999px;
   background: #ffffff;
@@ -360,6 +422,17 @@ body.nav-open .nav-backdrop {
   visibility: visible;
 }
 
+/* Section-level containment: prevents any section from causing horizontal scroll */
+.hero,
+.works,
+.contact,
+.site-header,
+.site-footer {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 .hero {
   padding: var(--space-2xl) 0 calc(var(--space-2xl) + var(--space-md));
   min-height: calc(100vh - 120px);
@@ -416,6 +489,7 @@ html.app-animate .contact {
   backdrop-filter: none;
   position: relative;
   overflow: hidden;
+  min-width: 0;
 }
 
 /* removed inner border from hero card to avoid faint outline */
@@ -424,6 +498,7 @@ html.app-animate .contact {
   position: relative;
   z-index: 1;
   max-width: 560px;
+  min-width: 0;
 }
 
 h1 {
@@ -528,6 +603,7 @@ h1 {
   margin-left: auto;
   width: 100%;
   max-width: 460px;
+  min-width: 0;
   padding: 28px 32px 28px;
   background: #26272b;
   border-radius: 43px;
@@ -657,9 +733,11 @@ h1 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
   align-items: start;
+  min-width: 0;
 }
 
 .work-card {
+  min-width: 0;
   background: #ffffff;
   border-radius: 22px;
   padding: 16px 16px 18px;
@@ -677,6 +755,8 @@ h1 {
 .work-media {
   width: 100%;
   height: auto;
+  max-width: 100%;
+  object-fit: cover;
   border-radius: 16px;
   border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
@@ -733,6 +813,7 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
+  min-width: 0;
   padding: 20px 22px 22px;
   border-radius: var(--radius-md);
   background: #ffffff;
@@ -792,6 +873,7 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
+  min-width: 0;
   font-size: 0.8rem;
   color: #000000;
 }
@@ -864,6 +946,13 @@ h1 {
   font-size: 0.7rem;
   opacity: 0.85;
   color: var(--text-muted);
+}
+
+/* Tablet: 2 columns for works grid to prevent horizontal overflow */
+@media (max-width: 900px) {
+  .works-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 960px) {
@@ -988,7 +1077,7 @@ h1 {
 
 @media (max-width: 540px) {
   .container {
-    width: min(1180px, 100% - 32px);
+    padding-inline: 16px;
   }
 
   .hero-cta-pill {
