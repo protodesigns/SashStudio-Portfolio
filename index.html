@@ -757,17 +757,19 @@ window.addEventListener('beforeprint',e=>e.preventDefault());
       <h2 class="section-heading">Let's Create<br>Something<br>Extraordinary</h2>
       <p class="contact-desc">Whether it's a cinematic project, a brand identity, a 3D world, or something entirely new — I'm here to bring your vision to life with craft and intention.</p>
       <div class="contact-links">
-        <a href="mailto:sash@email.com" class="c-link"><div class="c-icon">✉️</div>sash@email.com</a>
-        <a href="https://instagram.com/" target="_blank" rel="noopener" class="c-link"><div class="c-icon">📸</div>@sash.visuals</a>
-        <a href="https://behance.net/" target="_blank" rel="noopener" class="c-link"><div class="c-icon">🎨</div>Behance Portfolio</a>
+        <a href="mailto:sashrakesh@outlook.com" class="c-link"><div class="c-icon">✉️</div>sashrakesh@outlook.com</a>
+        <a href="https://www.instagram.com/forgedvisuals/" target="_blank" rel="noopener" class="c-link"><div class="c-icon">📸</div>@forgedvisuals</a>
+        <a href="https://www.instagram.com/cine0void/" target="_blank" rel="noopener" class="c-link"><div class="c-icon">🎬</div>@cine0void</a>
+        <a href="https://www.behance.net/sashrakesh3d" target="_blank" rel="noopener" class="c-link"><div class="c-icon">🎨</div>Behance — sashrakesh3d</a>
       </div>
     </div>
     <div class="reveal">
       <div class="form-card">
-        <div class="form-field"><label>Your Name</label><input type="text" placeholder="e.g. Alex Rivera" autocomplete="off"></div>
-        <div class="form-field"><label>Email</label><input type="email" placeholder="your@email.com" autocomplete="email"></div>
-        <div class="form-field"><label>Message</label><textarea placeholder="Tell me about your project..." rows="4"></textarea></div>
-        <button class="send-btn">Send Message →</button>
+        <div class="form-field"><label>Your Name</label><input type="text" id="f-name" name="name" placeholder="e.g. Alex Rivera" autocomplete="off" required></div>
+        <div class="form-field"><label>Email</label><input type="email" id="f-email" name="email" placeholder="your@email.com" autocomplete="email" required></div>
+        <div class="form-field"><label>Message</label><textarea id="f-msg" name="message" placeholder="Tell me about your project..." rows="4" required></textarea></div>
+        <div id="form-status" style="font-size:.72rem;color:var(--cyan);text-align:center;min-height:1.4em;margin-bottom:.6rem;letter-spacing:.08em;transition:opacity .3s;"></div>
+        <button class="send-btn" id="send-btn">Send Message →</button>
       </div>
     </div>
   </div>
@@ -1129,6 +1131,52 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     const t=document.querySelector(a.getAttribute('href'));
     if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});}
   });
+});
+
+/* ════════════════════════════════════════
+   FORMSPREE CONTACT
+════════════════════════════════════════ */
+document.getElementById('send-btn').addEventListener('click', async ()=>{
+  const name    = document.getElementById('f-name').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+  const message = document.getElementById('f-msg').value.trim();
+  const status  = document.getElementById('form-status');
+  const btn     = document.getElementById('send-btn');
+
+  if(!name || !email || !message){
+    status.style.color = 'var(--pink)';
+    status.textContent = 'Please fill in all fields.';
+    return;
+  }
+
+  btn.textContent = 'Sending...';
+  btn.style.opacity = '0.7';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('https://formspree.io/f/xgorgbjo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ name, email, message })
+    });
+    if(res.ok){
+      status.style.color = 'var(--cyan)';
+      status.textContent = '✦ Message sent! I will get back to you soon.';
+      document.getElementById('f-name').value = '';
+      document.getElementById('f-email').value = '';
+      document.getElementById('f-msg').value = '';
+      btn.textContent = 'Sent ✓';
+      btn.style.background = 'linear-gradient(135deg,var(--teal),var(--cyan))';
+    } else {
+      throw new Error('Failed');
+    }
+  } catch(e){
+    status.style.color = 'var(--pink)';
+    status.textContent = 'Something went wrong. Try emailing directly.';
+    btn.textContent = 'Send Message →';
+    btn.style.opacity = '1';
+    btn.disabled = false;
+  }
 });
 </script>
 </body>
