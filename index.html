@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Montserrat+Alternates:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://www.google.com/recaptcha/enterprise.js?render=6LemwNEsAAAAANffPgZMn7yM1E1j9gM2ofqiPFmU" async defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
 /* ═══════════════════════════════════════════
    RESET & ROOT
@@ -886,7 +886,10 @@ nav {
 }
 .form-confirm label strong { color: var(--white); font-weight: 600; }
 
-/* reCAPTCHA Enterprise: invisible, no wrapper needed */
+/* Cloudflare Turnstile wrapper */
+.cf-turnstile-wrap {
+  margin-bottom: 1.1rem;
+}
 
 /* Field error shake */
 @keyframes shake {
@@ -1241,7 +1244,14 @@ footer {
           <input type="checkbox" id="f-confirm">
           <span><strong>I confirm this is a genuine enquiry.</strong> I understand that Sash's contact is provided solely for project collaboration and professional outreach — not spam or unsolicited promotions.</span>
         </label>
-        <!-- reCAPTCHA Enterprise: invisible, fires on submit -->
+        <!-- Cloudflare Turnstile -->
+        <div class="cf-turnstile-wrap">
+          <div class="cf-turnstile"
+               data-sitekey="0x4AAAAAADGT34VtyTf0J9ZL"
+               data-theme="dark"
+               data-size="normal">
+          </div>
+        </div>
         <div id="form-status" role="status" aria-live="polite"></div>
         <button class="send-btn" id="send-btn">Send Message</button>
       </div>
@@ -1711,23 +1721,42 @@ function isGibberish(str) {
   const s = str.toLowerCase().replace(/[^a-z]/g, '');
   if (s.length < 3) return false;
 
-  // Check consonant run > 5 (e.g. "dgsvdtcd")
-  const consonants = s.replace(/[aeiou]/g, '');
-  if (consonants.length / s.length > 0.85 && s.length > 4) return true;
-
-  // Check repeated character (e.g. "aaaaaaa")
-  if (/(.){4,}/.test(s)) return true;
-
-  // Check keyboard mash patterns
+  // Only flag clear keyboard mash patterns
   const mashPatterns = ['qwerty','asdfgh','zxcvbn','qweasd','poiuyt','lkjhgf','mnbvcx'];
   for (const p of mashPatterns) {
     if (s.includes(p)) return true;
   }
 
-  // Ratio of unique chars to total — very low = likely spam
-  const unique = new Set(s.split('')).size;
-  if (s.length > 6 && unique / s.length < 0.3) return true;
+  // Repeated same character 5+ times (e.g. "aaaaaa", "xxxxxxx")
+  if (/(.){4,}/.test(s)) return true;
 
+  // Only flag very long strings (8+ chars) with almost no vowels
+  // This avoids flagging short names like "sash", "ragesh", "priya"
+  if (s.length >= 8) {
+    const vowels = (s.match(/[aeiou]/g) || []).length;
+    if (vowels / s.length < 0.1) return true;
+  }
+
+  // Ratio of unique chars extremely low on longer strings only
+  const unique = new Set(s.split('')).size;
+  if (s.length > 10 && unique / s.length < 0.25) return true;
+
+  return false;
+}
+
+// Message-specific spam check (repetition detection)
+function isSpamMessage(str) {
+  if (!str || str.length < 10) return false;
+  // Detect copy-pasted repetition: same phrase repeated 3+ times
+  const words = str.trim().split(/\s+/);
+  if (words.length < 6) return false;
+  // Slide a window of 4 words and check if it repeats
+  const phrases = {};
+  for (let i = 0; i <= words.length - 4; i++) {
+    const phrase = words.slice(i, i + 4).join(' ').toLowerCase();
+    phrases[phrase] = (phrases[phrase] || 0) + 1;
+    if (phrases[phrase] >= 3) return true;
+  }
   return false;
 }
 
@@ -1794,6 +1823,9 @@ document.getElementById('send-btn').addEventListener('click', async () => {
   } else if (isGibberish(msgVal)) {
     fieldError(msgInput, document.getElementById('err-msg'), 'Your message looks like random text. Please write a genuine message.');
     hasError = true;
+  } else if (isSpamMessage(msgVal)) {
+    fieldError(msgInput, document.getElementById('err-msg'), 'Your message appears to be repeated text. Please write a genuine message.');
+    hasError = true;
   }
 
   // ── Confirm checkbox
@@ -1809,22 +1841,25 @@ document.getElementById('send-btn').addEventListener('click', async () => {
   btn.style.opacity = '0.65';
   btn.disabled      = true;
 
-  try {
-    // reCAPTCHA Enterprise — get token invisibly
-    let recaptchaToken = '';
-    if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
-      recaptchaToken = await grecaptcha.enterprise.execute(
-        '6LemwNEsAAAAANffPgZMn7yM1E1j9gM2ofqiPFmU',
-        { action: 'CONTACT_FORM' }
-      );
-    }
+  // ── Cloudflare Turnstile check
+  const turnstileEl = document.querySelector('[name="cf-turnstile-response"]');
+  const turnstileToken = turnstileEl ? turnstileEl.value : '';
+  if (!turnstileToken) {
+    status.style.color = 'var(--pink)';
+    status.textContent = 'Please complete the security check.';
+    btn.textContent   = 'Send Message';
+    btn.style.opacity = '1';
+    btn.disabled      = false;
+    return;
+  }
 
+  try {
     const res = await fetch('https://formspree.io/f/xgorgbjo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         name: nameVal, email: emailVal, message: msgVal,
-        'g-recaptcha-response': recaptchaToken
+        'cf-turnstile-response': turnstileToken
       })
     });
 
@@ -1837,6 +1872,7 @@ document.getElementById('send-btn').addEventListener('click', async () => {
       confirmEl.checked = false;
       btn.textContent   = 'Sent ✓';
       btn.style.background = 'linear-gradient(135deg, var(--teal), var(--cyan))';
+      if (typeof turnstile !== 'undefined') turnstile.reset();
     } else {
       throw new Error('Server error');
     }
@@ -1846,6 +1882,7 @@ document.getElementById('send-btn').addEventListener('click', async () => {
     btn.textContent    = 'Send Message';
     btn.style.opacity  = '1';
     btn.disabled       = false;
+    if (typeof turnstile !== 'undefined') turnstile.reset();
   }
 });
 </script>
