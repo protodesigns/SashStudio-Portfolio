@@ -464,11 +464,17 @@ nav {
   border: none; display: block;
 }
 
-/* Thumbnail grid for the other two reels */
+/* Thumbnail grid */
 .reel-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: clamp(.8rem,1.5vw,1.2rem);
+}
+/* Last item spans full width if odd number of thumbs */
+.reel-grid .reel-thumb:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  max-width: 50%;
+  justify-self: center;
 }
 
 .reel-thumb {
@@ -1136,7 +1142,7 @@ footer {
     <h2 class="section-heading">Showreels</h2>
   </div>
 
-  <!-- Featured reel: poster shown, iframe loads on click -->
+  <!-- Featured reel -->
   <div class="reel-featured reveal" id="reel-1"
        data-vid="qR3rBWDF_No"
        tabindex="0" role="button" aria-label="Play showreel 1">
@@ -1153,15 +1159,15 @@ footer {
     </div>
   </div>
 
-  <!-- Two secondary reels side by side -->
+  <!-- Video grid — 2 columns -->
   <div class="reel-grid reveal">
 
     <div class="reel-thumb" id="reel-2"
          data-vid="yJ18RejbmKs"
-         tabindex="0" role="button" aria-label="Play showreel 2">
+         tabindex="0" role="button" aria-label="Play video 2">
       <img class="reel-poster" src="https://i.ytimg.com/vi/yJ18RejbmKs/maxresdefault.jpg"
            onerror="this.src='https://i.ytimg.com/vi/yJ18RejbmKs/hqdefault.jpg'"
-           alt="Showreel 2 thumbnail" draggable="false">
+           alt="Showreel II thumbnail" draggable="false">
       <div class="reel-play-overlay" aria-hidden="true">
         <div class="reel-play-btn">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1169,15 +1175,14 @@ footer {
           </svg>
         </div>
       </div>
-      <div class="reel-label">Reel II</div>
+      <div class="reel-label">Showreel II</div>
     </div>
-
     <div class="reel-thumb" id="reel-3"
          data-vid="fgyawyINQN0"
-         tabindex="0" role="button" aria-label="Play showreel 3">
+         tabindex="0" role="button" aria-label="Play video 3">
       <img class="reel-poster" src="https://i.ytimg.com/vi/fgyawyINQN0/maxresdefault.jpg"
            onerror="this.src='https://i.ytimg.com/vi/fgyawyINQN0/hqdefault.jpg'"
-           alt="Showreel 3 thumbnail" draggable="false">
+           alt="Showreel III thumbnail" draggable="false">
       <div class="reel-play-overlay" aria-hidden="true">
         <div class="reel-play-btn">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1185,9 +1190,83 @@ footer {
           </svg>
         </div>
       </div>
-      <div class="reel-label">Reel III</div>
+      <div class="reel-label">Showreel III</div>
     </div>
-
+    <div class="reel-thumb" id="reel-4"
+         data-vid="Mrlia60Um94"
+         tabindex="0" role="button" aria-label="Play video 4">
+      <img class="reel-poster" src="https://i.ytimg.com/vi/Mrlia60Um94/maxresdefault.jpg"
+           onerror="this.src='https://i.ytimg.com/vi/Mrlia60Um94/hqdefault.jpg'"
+           alt="Film IV thumbnail" draggable="false">
+      <div class="reel-play-overlay" aria-hidden="true">
+        <div class="reel-play-btn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="reel-label">Film IV</div>
+    </div>
+    <div class="reel-thumb" id="reel-5"
+         data-vid="ig6c51UhFYk"
+         tabindex="0" role="button" aria-label="Play video 5">
+      <img class="reel-poster" src="https://i.ytimg.com/vi/ig6c51UhFYk/maxresdefault.jpg"
+           onerror="this.src='https://i.ytimg.com/vi/ig6c51UhFYk/hqdefault.jpg'"
+           alt="Film V thumbnail" draggable="false">
+      <div class="reel-play-overlay" aria-hidden="true">
+        <div class="reel-play-btn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="reel-label">Film V</div>
+    </div>
+    <div class="reel-thumb" id="reel-6"
+         data-vid="gVHaVIV4KbE"
+         tabindex="0" role="button" aria-label="Play video 6">
+      <img class="reel-poster" src="https://i.ytimg.com/vi/gVHaVIV4KbE/maxresdefault.jpg"
+           onerror="this.src='https://i.ytimg.com/vi/gVHaVIV4KbE/hqdefault.jpg'"
+           alt="Film VI thumbnail" draggable="false">
+      <div class="reel-play-overlay" aria-hidden="true">
+        <div class="reel-play-btn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="reel-label">Film VI</div>
+    </div>
+    <div class="reel-thumb" id="reel-7"
+         data-vid="zpiUBQmO7GI"
+         tabindex="0" role="button" aria-label="Play video 7">
+      <img class="reel-poster" src="https://i.ytimg.com/vi/zpiUBQmO7GI/maxresdefault.jpg"
+           onerror="this.src='https://i.ytimg.com/vi/zpiUBQmO7GI/hqdefault.jpg'"
+           alt="Film VII thumbnail" draggable="false">
+      <div class="reel-play-overlay" aria-hidden="true">
+        <div class="reel-play-btn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="reel-label">Film VII</div>
+    </div>
+    <div class="reel-thumb" id="reel-8"
+         data-vid="5f7CIdtXDcc"
+         tabindex="0" role="button" aria-label="Play video 8">
+      <img class="reel-poster" src="https://i.ytimg.com/vi/5f7CIdtXDcc/maxresdefault.jpg"
+           onerror="this.src='https://i.ytimg.com/vi/5f7CIdtXDcc/hqdefault.jpg'"
+           alt="Film VIII thumbnail" draggable="false">
+      <div class="reel-play-overlay" aria-hidden="true">
+        <div class="reel-play-btn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="reel-label">Film VIII</div>
+    </div>
   </div>
 </section>
 
