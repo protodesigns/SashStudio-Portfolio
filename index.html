@@ -589,7 +589,7 @@ nav {
   border: none; display: none;
 }
 .reel-featured.playing .reel-iframe,
-.reel-thumb.playing .reel-iframe { display: block; }
+.reel-thumb.playing .reel-iframe { display: block; z-index: 10; position: absolute; inset: 0; width: 100%; height: 100%; }
 
 /* Cinematic scan-line shimmer on featured */
 .reel-featured::after {
@@ -1482,14 +1482,21 @@ document.querySelectorAll('.reel-featured, .reel-thumb').forEach(el => {
   iframe.allowFullscreen = true;
   el.appendChild(iframe);
 
-  function activateReel() {
+  function activateReel(e) {
+    if (e) e.stopPropagation();
     if (el.classList.contains('playing')) return;
     iframe.src = 'https://www.youtube.com/embed/' + vid
-      + '?rel=0&modestbranding=1&color=white&autoplay=1';
+      + '?rel=0&modestbranding=1&color=white&autoplay=1&enablejsapi=1';
     el.classList.add('playing');
   }
 
+  // Listen on both the container AND the overlay/button so click always fires
   el.addEventListener('click', activateReel);
+  const overlay = el.querySelector('.reel-play-overlay');
+  const btn = el.querySelector('.reel-play-btn');
+  if (overlay) overlay.addEventListener('click', activateReel);
+  if (btn) btn.addEventListener('click', activateReel);
+
   el.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activateReel(); }
   });
