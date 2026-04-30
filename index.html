@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Montserrat+Alternates:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script src="https://www.google.com/recaptcha/enterprise.js?render=6LemwNEsAAAAANffPgZMn7yM1E1j9gM2ofqiPFmU" async defer></script>
 <style>
 /* ═══════════════════════════════════════════
    RESET & ROOT
@@ -537,6 +537,56 @@ nav {
 }
 .reel-thumb:hover .reel-label { opacity: 1; transform: translateY(0); }
 
+/* Poster image inside reels */
+.reel-poster {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: brightness(.82) saturate(.9);
+  transition: filter .5s, transform .6s cubic-bezier(.16,1,.3,1);
+  pointer-events: none; user-select: none;
+}
+.reel-featured:hover .reel-poster,
+.reel-thumb:hover .reel-poster {
+  filter: brightness(.65) saturate(1.1);
+  transform: scale(1.03);
+}
+
+/* Featured play button — larger */
+.reel-play-overlay--featured {
+  flex-direction: column; gap: .8rem;
+}
+.reel-play-btn--lg {
+  width: clamp(56px,8vw,80px);
+  height: clamp(56px,8vw,80px);
+}
+.reel-play-btn--lg svg {
+  width: clamp(22px,3vw,30px);
+  height: clamp(22px,3vw,30px);
+  margin-left: 4px;
+}
+.reel-play-label {
+  font-size: clamp(.6rem,.8vw,.72rem);
+  font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(240,248,255,.7);
+}
+
+/* Active (playing) state — hide overlay, show iframe */
+.reel-featured.playing .reel-poster,
+.reel-thumb.playing .reel-poster { display: none; }
+.reel-featured.playing .reel-play-overlay,
+.reel-thumb.playing .reel-play-overlay { display: none; }
+.reel-featured.playing .reel-label,
+.reel-thumb.playing .reel-label { display: none; }
+
+.reel-iframe {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: none; display: none;
+}
+.reel-featured.playing .reel-iframe,
+.reel-thumb.playing .reel-iframe { display: block; }
+
 /* Cinematic scan-line shimmer on featured */
 .reel-featured::after {
   content: '';
@@ -836,11 +886,7 @@ nav {
 }
 .form-confirm label strong { color: var(--white); font-weight: 600; }
 
-/* reCAPTCHA wrapper */
-.recaptcha-wrap {
-  display: flex; justify-content: flex-start;
-  margin-bottom: 1.1rem;
-}
+/* reCAPTCHA Enterprise: invisible, no wrapper needed */
 
 /* Field error shake */
 @keyframes shake {
@@ -1083,28 +1129,32 @@ footer {
     <h2 class="section-heading">Showreels</h2>
   </div>
 
-  <!-- Featured reel (first video, full width) -->
-  <div class="reel-featured reveal">
-    <iframe
-      src="https://www.youtube.com/embed/qR3rBWDF_No?rel=0&modestbranding=1&color=white"
-      title="Showreel — Sash"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      allowfullscreen
-      loading="lazy">
-    </iframe>
+  <!-- Featured reel: poster shown, iframe loads on click -->
+  <div class="reel-featured reveal" id="reel-1"
+       data-vid="qR3rBWDF_No"
+       tabindex="0" role="button" aria-label="Play showreel 1">
+    <img class="reel-poster" src="https://i.ytimg.com/vi/qR3rBWDF_No/maxresdefault.jpg"
+         onerror="this.src='https://i.ytimg.com/vi/qR3rBWDF_No/hqdefault.jpg'"
+         alt="Showreel 1 thumbnail" draggable="false">
+    <div class="reel-play-overlay reel-play-overlay--featured" aria-hidden="true">
+      <div class="reel-play-btn reel-play-btn--lg">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </div>
+      <span class="reel-play-label">Play Showreel</span>
+    </div>
   </div>
 
   <!-- Two secondary reels side by side -->
   <div class="reel-grid reveal">
 
-    <div class="reel-thumb" id="reel-2" tabindex="0" role="button" aria-label="Play showreel 2">
-      <iframe
-        src="https://www.youtube.com/embed/yJ18RejbmKs?rel=0&modestbranding=1&color=white"
-        title="Showreel 2 — Sash"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen
-        loading="lazy">
-      </iframe>
+    <div class="reel-thumb" id="reel-2"
+         data-vid="yJ18RejbmKs"
+         tabindex="0" role="button" aria-label="Play showreel 2">
+      <img class="reel-poster" src="https://i.ytimg.com/vi/yJ18RejbmKs/maxresdefault.jpg"
+           onerror="this.src='https://i.ytimg.com/vi/yJ18RejbmKs/hqdefault.jpg'"
+           alt="Showreel 2 thumbnail" draggable="false">
       <div class="reel-play-overlay" aria-hidden="true">
         <div class="reel-play-btn">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1115,14 +1165,12 @@ footer {
       <div class="reel-label">Reel II</div>
     </div>
 
-    <div class="reel-thumb" id="reel-3" tabindex="0" role="button" aria-label="Play showreel 3">
-      <iframe
-        src="https://www.youtube.com/embed/fgyawyINQN0?rel=0&modestbranding=1&color=white"
-        title="Showreel 3 — Sash"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen
-        loading="lazy">
-      </iframe>
+    <div class="reel-thumb" id="reel-3"
+         data-vid="fgyawyINQN0"
+         tabindex="0" role="button" aria-label="Play showreel 3">
+      <img class="reel-poster" src="https://i.ytimg.com/vi/fgyawyINQN0/maxresdefault.jpg"
+           onerror="this.src='https://i.ytimg.com/vi/fgyawyINQN0/hqdefault.jpg'"
+           alt="Showreel 3 thumbnail" draggable="false">
       <div class="reel-play-overlay" aria-hidden="true">
         <div class="reel-play-btn">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1193,10 +1241,7 @@ footer {
           <input type="checkbox" id="f-confirm">
           <span><strong>I confirm this is a genuine enquiry.</strong> I understand that Sash's contact is provided solely for project collaboration and professional outreach — not spam or unsolicited promotions.</span>
         </label>
-        <!-- reCAPTCHA -->
-        <div class="recaptcha-wrap">
-          <div class="g-recaptcha" data-sitekey="6Lcu69EsAAAAAGcdOqbEGBfyiJak7PrRS07PrBzC" data-theme="dark"></div>
-        </div>
+        <!-- reCAPTCHA Enterprise: invisible, fires on submit -->
         <div id="form-status" role="status" aria-live="polite"></div>
         <button class="send-btn" id="send-btn">Send Message</button>
       </div>
@@ -1409,25 +1454,29 @@ const collage = document.getElementById('collage');
 })();
 
 /* ═══════════════════════════════════════════
-   SHOWREEL — enable iframe interaction on thumb click
+   SHOWREEL — click poster to load iframe
 ═══════════════════════════════════════════ */
-document.querySelectorAll('.reel-thumb').forEach(thumb => {
-  const overlay = thumb.querySelector('.reel-play-overlay');
-  const iframe  = thumb.querySelector('iframe');
+document.querySelectorAll('.reel-featured, .reel-thumb').forEach(el => {
+  const vid = el.dataset.vid;
+  if (!vid) return;
+
+  // Pre-create iframe, don't set src yet
+  const iframe = document.createElement('iframe');
+  iframe.className = 'reel-iframe';
+  iframe.title = el.getAttribute('aria-label') || 'Showreel';
+  iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+  iframe.allowFullscreen = true;
+  el.appendChild(iframe);
 
   function activateReel() {
-    if (overlay) overlay.style.display = 'none';
-    if (iframe) {
-      iframe.style.pointerEvents = 'auto';
-      // Append autoplay to src
-      const url = new URL(iframe.src);
-      url.searchParams.set('autoplay', '1');
-      iframe.src = url.toString();
-    }
+    if (el.classList.contains('playing')) return;
+    iframe.src = 'https://www.youtube.com/embed/' + vid
+      + '?rel=0&modestbranding=1&color=white&autoplay=1';
+    el.classList.add('playing');
   }
 
-  thumb.addEventListener('click', activateReel);
-  thumb.addEventListener('keydown', e => {
+  el.addEventListener('click', activateReel);
+  el.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activateReel(); }
   });
 });
@@ -1754,14 +1803,6 @@ document.getElementById('send-btn').addEventListener('click', async () => {
     hasError = true;
   }
 
-  // ── reCAPTCHA
-  const recaptchaResponse = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
-  if (!recaptchaResponse) {
-    status.style.color = 'var(--pink)';
-    status.textContent = 'Please complete the reCAPTCHA verification.';
-    hasError = true;
-  }
-
   if (hasError) return;
 
   btn.textContent   = 'Sending...';
@@ -1769,24 +1810,32 @@ document.getElementById('send-btn').addEventListener('click', async () => {
   btn.disabled      = true;
 
   try {
+    // reCAPTCHA Enterprise — get token invisibly
+    let recaptchaToken = '';
+    if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
+      recaptchaToken = await grecaptcha.enterprise.execute(
+        '6LemwNEsAAAAANffPgZMn7yM1E1j9gM2ofqiPFmU',
+        { action: 'CONTACT_FORM' }
+      );
+    }
+
     const res = await fetch('https://formspree.io/f/xgorgbjo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         name: nameVal, email: emailVal, message: msgVal,
-        'g-recaptcha-response': recaptchaResponse
+        'g-recaptcha-response': recaptchaToken
       })
     });
 
     if (res.ok) {
       status.style.color = 'var(--cyan)';
       status.textContent = 'Message sent. I will be in touch shortly.';
-      nameInput.value  = '';
-      emailInput.value = '';
-      msgInput.value   = '';
+      nameInput.value   = '';
+      emailInput.value  = '';
+      msgInput.value    = '';
       confirmEl.checked = false;
-      grecaptcha.reset();
-      btn.textContent = 'Sent ✓';
+      btn.textContent   = 'Sent ✓';
       btn.style.background = 'linear-gradient(135deg, var(--teal), var(--cyan))';
     } else {
       throw new Error('Server error');
@@ -1797,7 +1846,6 @@ document.getElementById('send-btn').addEventListener('click', async () => {
     btn.textContent    = 'Send Message';
     btn.style.opacity  = '1';
     btn.disabled       = false;
-    if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
   }
 });
 </script>
