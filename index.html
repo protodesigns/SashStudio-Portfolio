@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Montserrat+Alternates:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <style>
 /* ═══════════════════════════════════════════
    RESET & ROOT
@@ -795,6 +796,72 @@ nav {
 
 @media (max-width: 800px) { .contact-grid { grid-template-columns: 1fr; gap: 3rem; } }
 
+/* Confirm checkbox */
+.form-confirm {
+  display: flex; align-items: flex-start; gap: .75rem;
+  margin-bottom: 1.1rem;
+  padding: clamp(.7rem,1.5vw,.9rem) clamp(.8rem,2vw,1.1rem);
+  border-radius: clamp(8px,1.5vw,11px);
+  background: rgba(255,255,255,.03); border: 1px solid var(--glass-b);
+  cursor: pointer; transition: border-color .3s, background .3s;
+  -webkit-tap-highlight-color: transparent;
+}
+.form-confirm:has(input:checked) {
+  border-color: rgba(0,212,255,.35); background: rgba(0,212,255,.04);
+}
+.form-confirm input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none;
+  width: 18px; height: 18px; min-width: 18px;
+  border-radius: 5px; border: 1.5px solid var(--glass-b);
+  background: rgba(255,255,255,.05);
+  cursor: pointer; position: relative; margin-top: 2px;
+  transition: background .25s, border-color .25s; flex-shrink: 0;
+}
+.form-confirm input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  border-color: transparent;
+}
+.form-confirm input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute; left: 5px; top: 2px;
+  width: 5px; height: 9px;
+  border: 2px solid #000; border-top: none; border-left: none;
+  transform: rotate(45deg);
+}
+.form-confirm label {
+  font-size: clamp(.65rem,.8vw,.72rem); color: var(--muted);
+  line-height: 1.6; cursor: pointer; user-select: none;
+  font-weight: 400; letter-spacing: 0; text-transform: none;
+  margin-bottom: 0;
+}
+.form-confirm label strong { color: var(--white); font-weight: 600; }
+
+/* reCAPTCHA wrapper */
+.recaptcha-wrap {
+  display: flex; justify-content: flex-start;
+  margin-bottom: 1.1rem;
+}
+
+/* Field error shake */
+@keyframes shake {
+  0%,100%{ transform:translateX(0) }
+  20%{ transform:translateX(-6px) }
+  40%{ transform:translateX(6px) }
+  60%{ transform:translateX(-4px) }
+  80%{ transform:translateX(4px) }
+}
+.field-error {
+  border-color: rgba(255,45,155,.5) !important;
+  animation: shake .4s ease;
+}
+.field-error-msg {
+  font-size: .6rem; color: var(--pink);
+  margin-top: .3rem; letter-spacing: .05em;
+  display: none;
+}
+.field-error-msg.show { display: block; }
+
+
 /* ═══════════════════════════════════════════
    FOOTER
 ═══════════════════════════════════════════ */
@@ -1109,14 +1176,26 @@ footer {
         <div class="form-field">
           <label for="f-name">Your Name</label>
           <input type="text" id="f-name" name="name" placeholder="e.g. Alex Rivera" autocomplete="name" required>
+          <div class="field-error-msg" id="err-name"></div>
         </div>
         <div class="form-field">
           <label for="f-email">Email Address</label>
           <input type="email" id="f-email" name="email" placeholder="your@email.com" autocomplete="email" required>
+          <div class="field-error-msg" id="err-email"></div>
         </div>
         <div class="form-field">
           <label for="f-msg">Message</label>
           <textarea id="f-msg" name="message" placeholder="Tell me about your project..." rows="4" required></textarea>
+          <div class="field-error-msg" id="err-msg"></div>
+        </div>
+        <!-- Genuine enquiry confirmation -->
+        <label class="form-confirm">
+          <input type="checkbox" id="f-confirm">
+          <span><strong>I confirm this is a genuine enquiry.</strong> I understand that Sash's contact is provided solely for project collaboration and professional outreach — not spam or unsolicited promotions.</span>
+        </label>
+        <!-- reCAPTCHA -->
+        <div class="recaptcha-wrap">
+          <div class="g-recaptcha" data-sitekey="6Lcu69EsAAAAAGcdOqbEGBfyiJak7PrRS07PrBzC" data-theme="dark"></div>
         </div>
         <div id="form-status" role="status" aria-live="polite"></div>
         <button class="send-btn" id="send-btn">Send Message</button>
@@ -1545,47 +1624,169 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 });
 
 /* ═══════════════════════════════════════════
-   CONTACT FORM
+   CONTACT FORM — SPAM FILTER + RECAPTCHA
 ═══════════════════════════════════════════ */
+
+// Disposable / temp mail domains blocklist
+const TEMP_DOMAINS = new Set([
+  'mailinator.com','guerrillamail.com','guerrillamail.net','guerrillamail.org',
+  'guerrillamail.biz','guerrillamail.de','guerrillamail.info','sharklasers.com',
+  'guerrillamailblock.com','grr.la','guerrillamail.com','spam4.me',
+  'trashmail.com','trashmail.me','trashmail.net','trashmail.at','trashmail.io',
+  'trashmail.xyz','dispostable.com','mailnull.com','spamgourmet.com',
+  'yopmail.com','yopmail.fr','cool.fr.nf','jetable.fr.nf','nospam.ze.tc',
+  'nomail.xl.cx','mega.zik.dj','speed.1s.fr','courriel.fr.nf','moncourrier.fr.nf',
+  'monemail.fr.nf','monmail.fr.nf','10minutemail.com','10minutemail.net',
+  '10minutemail.org','10minutemail.de','10minutemail.co.uk','10minutemail.info',
+  '10minemail.com','tempmail.com','tempmail.net','tempmail.org','temp-mail.org',
+  'temp-mail.ru','tempr.email','discard.email','spamfree24.org','spamfree24.de',
+  'spamfree24.eu','spamfree24.info','spamfree24.net','spamfree.eu',
+  'maildrop.cc','spamspot.com','spamspot.net','spamex.com','throwam.com',
+  'filzmail.com','fakeinbox.com','mailnesia.com','mailnull.com','owlpic.com',
+  'throwam.com','throwaway.email','thrma.com','trbvm.com','tutuapp.bid',
+  'mailezee.com','mt2014.com','mt2015.com','yy.com','gufum.com','hom.ee',
+  'sharklasers.com','spam.la','spamgourmet.net','spamgourmet.org',
+  'crazymailing.com','0-mail.com','027168.com','0815.ru','0815.su',
+  '0clickemail.com','0wnd.net','0wnd.org','10mail.com','123-m.com',
+  '1fsdfdsfsdf.tk','1pad.de','20mail.eu','20mail.it','20minutemail.com',
+  '2fdgdfgdfgdf.tk','2prong.com','3d-painting.com','4warding.com',
+  '4warding.net','4warding.org','60minutemail.com','6hjgjhgkilkj.tk',
+  '6paq.com','6url.com','75hosting.com','7tags.com','7teamsport.com',
+  'mailtemp.info','mailtemp.net','inboxbear.com','getairmail.com',
+  'dispostable.com','spamhole.com','spamhole.net'
+]);
+
+// Gibberish / spam text detector
+function isGibberish(str) {
+  if (!str || str.length < 3) return false;
+  const s = str.toLowerCase().replace(/[^a-z]/g, '');
+  if (s.length < 3) return false;
+
+  // Check consonant run > 5 (e.g. "dgsvdtcd")
+  const consonants = s.replace(/[aeiou]/g, '');
+  if (consonants.length / s.length > 0.85 && s.length > 4) return true;
+
+  // Check repeated character (e.g. "aaaaaaa")
+  if (/(.){4,}/.test(s)) return true;
+
+  // Check keyboard mash patterns
+  const mashPatterns = ['qwerty','asdfgh','zxcvbn','qweasd','poiuyt','lkjhgf','mnbvcx'];
+  for (const p of mashPatterns) {
+    if (s.includes(p)) return true;
+  }
+
+  // Ratio of unique chars to total — very low = likely spam
+  const unique = new Set(s.split('')).size;
+  if (s.length > 6 && unique / s.length < 0.3) return true;
+
+  return false;
+}
+
+function fieldError(inputEl, msgEl, message) {
+  inputEl.classList.add('field-error');
+  msgEl.textContent = message;
+  msgEl.classList.add('show');
+  inputEl.addEventListener('input', () => {
+    inputEl.classList.remove('field-error');
+    msgEl.classList.remove('show');
+  }, { once: true });
+}
+
 document.getElementById('send-btn').addEventListener('click', async () => {
-  const nameVal = document.getElementById('f-name').value.trim();
-  const emailVal = document.getElementById('f-email').value.trim();
-  const msgVal   = document.getElementById('f-msg').value.trim();
-  const status   = document.getElementById('form-status');
-  const btn      = document.getElementById('send-btn');
+  const nameInput  = document.getElementById('f-name');
+  const emailInput = document.getElementById('f-email');
+  const msgInput   = document.getElementById('f-msg');
+  const confirmEl  = document.getElementById('f-confirm');
+  const status     = document.getElementById('form-status');
+  const btn        = document.getElementById('send-btn');
 
+  const nameVal  = nameInput.value.trim();
+  const emailVal = emailInput.value.trim();
+  const msgVal   = msgInput.value.trim();
+
+  // Clear previous status
+  status.textContent = '';
+  status.style.color = '';
+
+  let hasError = false;
+
+  // ── Name checks
+  if (!nameVal) {
+    fieldError(nameInput, document.getElementById('err-name'), 'Please enter your name.');
+    hasError = true;
+  } else if (nameVal.length < 2) {
+    fieldError(nameInput, document.getElementById('err-name'), 'Name is too short.');
+    hasError = true;
+  } else if (isGibberish(nameVal)) {
+    fieldError(nameInput, document.getElementById("err-name"), "That doesn't look like a real name. Please enter your actual name.");
+    hasError = true;
+  }
+
+  // ── Email checks
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
+  if (!emailVal || !emailOk) {
+    fieldError(emailInput, document.getElementById('err-email'), 'Please enter a valid email address.');
+    hasError = true;
+  } else {
+    const domain = emailVal.split('@')[1].toLowerCase();
+    if (TEMP_DOMAINS.has(domain)) {
+      fieldError(emailInput, document.getElementById('err-email'), 'Disposable / temp emails are not accepted. Please use your real email address.');
+      hasError = true;
+    }
+  }
 
-  if (!nameVal || !emailVal || !msgVal) {
-    status.style.color   = 'var(--pink)';
-    status.textContent   = 'Please fill in all fields.';
-    return;
+  // ── Message checks
+  if (!msgVal) {
+    fieldError(msgInput, document.getElementById('err-msg'), 'Please write a message.');
+    hasError = true;
+  } else if (msgVal.length < 10) {
+    fieldError(msgInput, document.getElementById('err-msg'), 'Message is too short — tell me a bit more.');
+    hasError = true;
+  } else if (isGibberish(msgVal)) {
+    fieldError(msgInput, document.getElementById('err-msg'), 'Your message looks like random text. Please write a genuine message.');
+    hasError = true;
   }
-  if (!emailOk) {
-    status.style.color   = 'var(--pink)';
-    status.textContent   = 'Please enter a valid email address.';
-    return;
+
+  // ── Confirm checkbox
+  if (!confirmEl.checked) {
+    status.style.color = 'var(--pink)';
+    status.textContent = 'Please confirm this is a genuine enquiry.';
+    hasError = true;
   }
+
+  // ── reCAPTCHA
+  const recaptchaResponse = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
+  if (!recaptchaResponse) {
+    status.style.color = 'var(--pink)';
+    status.textContent = 'Please complete the reCAPTCHA verification.';
+    hasError = true;
+  }
+
+  if (hasError) return;
 
   btn.textContent   = 'Sending...';
   btn.style.opacity = '0.65';
   btn.disabled      = true;
-  status.textContent = '';
 
   try {
     const res = await fetch('https://formspree.io/f/xgorgbjo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ name: nameVal, email: emailVal, message: msgVal })
+      body: JSON.stringify({
+        name: nameVal, email: emailVal, message: msgVal,
+        'g-recaptcha-response': recaptchaResponse
+      })
     });
 
     if (res.ok) {
       status.style.color = 'var(--cyan)';
       status.textContent = 'Message sent. I will be in touch shortly.';
-      document.getElementById('f-name').value  = '';
-      document.getElementById('f-email').value = '';
-      document.getElementById('f-msg').value   = '';
-      btn.textContent = 'Sent';
+      nameInput.value  = '';
+      emailInput.value = '';
+      msgInput.value   = '';
+      confirmEl.checked = false;
+      grecaptcha.reset();
+      btn.textContent = 'Sent ✓';
       btn.style.background = 'linear-gradient(135deg, var(--teal), var(--cyan))';
     } else {
       throw new Error('Server error');
@@ -1596,6 +1797,7 @@ document.getElementById('send-btn').addEventListener('click', async () => {
     btn.textContent    = 'Send Message';
     btn.style.opacity  = '1';
     btn.disabled       = false;
+    if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
   }
 });
 </script>
